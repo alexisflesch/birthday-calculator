@@ -41,29 +41,30 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
       case 'years':
         if (current < 20) {
           const milestones = Array.from({ length: 5 }, (_, i) => current + i + 1);
-          const nextRoundNumber = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
+          const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
           if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
           return milestones;
         }
         const yearsDigits = current.toString().length;
         const yearsBase = Math.pow(10, yearsDigits - 1);
-        const yearsFirstMilestone = Math.ceil(current / yearsBase) * yearsBase;
+        const yearsFirstMilestone = Math.ceil((current + 1) / yearsBase) * yearsBase;
         const milestones = [
           yearsFirstMilestone,
           yearsFirstMilestone + yearsBase,
           yearsFirstMilestone + yearsBase * 2,
           yearsFirstMilestone + yearsBase * 3,
-          yearsFirstMilestone + yearsBase * 4
+          yearsFirstMilestone + yearsBase * 4,
+          yearsFirstMilestone + yearsBase * 5
         ];
-        const nextRoundNumber = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
+        const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
         return milestones;
 
       case 'months':
         let milestonesMonths;
-        if (current < 10) milestonesMonths = [10, 20, 30, 40, 50];
-        else if (current < 100) milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil(current / 10) * 10 + i * 10);
-        else milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil(current / 100) * 100 + i * 100);
+        if (current < 10) milestonesMonths = [10, 20, 30, 40, 50].filter(m => m > current);
+        else if (current < 100) milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil((current + 1) / 10) * 10 + i * 10);
+        else milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil((current + 1) / 100) * 100 + i * 100);
 
         const nextRoundNumberMonths = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestonesMonths.includes(nextRoundNumberMonths)) milestonesMonths.push(nextRoundNumberMonths);
@@ -72,13 +73,14 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
       case 'days':
         const daysDigits = current.toString().length;
         const daysBase = Math.min(Math.pow(10, daysDigits - 1), 1000);
-        const daysFirstMilestone = Math.ceil(current / daysBase) * daysBase;
+        const daysFirstMilestone = Math.ceil((current + 1) / daysBase) * daysBase;
         const milestonesDays = [
           daysFirstMilestone,
           daysFirstMilestone + daysBase,
           daysFirstMilestone + daysBase * 2,
           daysFirstMilestone + daysBase * 3,
-          daysFirstMilestone + daysBase * 4
+          daysFirstMilestone + daysBase * 4,
+          daysFirstMilestone + daysBase * 5
         ];
         const nextRoundNumberDays = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestonesDays.includes(nextRoundNumberDays)) milestonesDays.push(nextRoundNumberDays);
@@ -88,13 +90,14 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
       case 'seconds':
         const digits = current.toString().length;
         const base = Math.pow(10, digits - 2);  // Two significant digits
-        const firstMilestone = Math.ceil(current / base) * base;
+        const firstMilestone = Math.ceil((current + 1) / base) * base;
         const milestonesTime = [
           firstMilestone,
           firstMilestone + base,
           firstMilestone + base * 2,
           firstMilestone + base * 3,
-          firstMilestone + base * 4
+          firstMilestone + base * 4,
+          firstMilestone + base * 5
         ];
         const nextRoundNumberTime = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestonesTime.includes(nextRoundNumberTime)) milestonesTime.push(nextRoundNumberTime);
@@ -104,6 +107,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
         return [];
     }
   }
+
 
 
   function calculateNextDate(current: number, target: number, unit: string, birth: Date): Date {
