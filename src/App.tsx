@@ -10,109 +10,124 @@ interface MilestoneData {
   selectedMilestone: number;
 }
 
+
 function calculateMilestones(birthDate: Date, selectedMilestones: Record<string, number>): MilestoneData[] {
   const now = new Date();
   const birth = new Date(birthDate);
-  
-  // Calculate differences in various units
+
+  // Calculate elapsed time from birthdate (exact differences based on the birth moment)
   const diffMs = now.getTime() - birth.getTime();
   const diffSeconds = Math.floor(diffMs / 1000);
   const diffMinutes = Math.floor(diffSeconds / 60);
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  const diffMonths = Math.floor(diffDays / 30.44);
-  const diffYears = Math.floor(diffDays / 365.25);
 
-  // Generate milestone options for years based on current age
-  const generateYearOptions = (current: number): number[] => {
-    if (current < 1) {
-      return [1];
-    } else if (current < 5) {
-      return Array.from({ length: 5 }, (_, i) => current + i + 1);
-    } else if (current < 18) {
-      return Array.from({ length: 3 }, (_, i) => current + i + 1);
+  // Correct months and years calculation
+  const diffMonths = (now.getFullYear() - birth.getFullYear()) * 12 + (now.getMonth() - birth.getMonth());
+  let diffYears = now.getFullYear() - birth.getFullYear();
+  if (now.getMonth() < birth.getMonth() ||
+    (now.getMonth() === birth.getMonth() && now.getDate() < birth.getDate())) {
+    diffYears--;
+  }
+
+  function generateMilestoneOptions(current: number, unit: string): number[] {
+    switch (unit) {
+      case 'années':
+        if (current < 20) {
+          // For kids, just show next integers
+          return Array.from({ length: 5 }, (_, i) => current + i + 1);
+        }
+        if (current < 50) return [20, 30, 40, 50, 100];
+        if (current < 100) return [50, 100, 150, 200, 250];
+        return [100, 150, 200, 250, 300];
+
+      case 'mois':
+        // Base 10 multiples for months
+        if (current < 10) return [10, 20, 30, 40, 50];
+        if (current < 50) return [50, 100, 200, 300, 500];
+        if (current < 100) return [100, 200, 300, 500, 1000];
+        return [500, 1000, 1500, 2000, 2500];
+
+      case 'minutes':
+      case 'secondes':
+        // Ensure two-digit precision for large numbers
+        const digits = current.toString().length;
+        const base = Math.pow(10, digits - 1);
+
+        // First milestone
+        const firstMilestone = Math.ceil(current / base) * base;
+
+        // Generate subsequent milestones with consistent progression
+        const milestones = [
+          firstMilestone,
+          firstMilestone + base,
+          firstMilestone + base * 2,
+          firstMilestone + base * 3,
+          firstMilestone + base * 4
+        ];
+
+        // Filter out milestones that are less than or equal to current value
+        return milestones.filter(milestone => milestone > current).slice(0, 5);
+
+      default:
+        return [];
     }
-    return Array.from({ length: 10 }, (_, i) => current + i + 1);
-  };
+  }
 
-  // Generate milestone options for months based on age
-  const generateMonthOptions = (current: number): number[] => {
-    if (current < 12) {
-      // For babies, show next few months
-      return Array.from({ length: 5 }, (_, i) => current + i + 1);
-    } else if (current < 100) {
-      // For young children, show path to 100 months
-      const nextRound = Math.ceil(current / 10) * 10;
-      return Array.from({ length: 5 }, (_, i) => nextRound + i * 10);
-    } else if (current < 500) {
-      // For older children, show path to 500
-      const nextRound = Math.ceil(current / 50) * 50;
-      return Array.from({ length: 5 }, (_, i) => nextRound + i * 50);
-    }
-    // For adults, show 500 increments
-    const base = Math.floor(current / 500) * 500;
-    return Array.from({ length: 5 }, (_, i) => base + (i + 1) * 500);
-  };
+  function calculateNextDate(current: number, target: number, unit: string, birth: Date): Date {
+    const nextDate = new Date(birth);
 
-  // Generate milestone options for minutes and seconds based on current value
-  const generateTimeOptions = (current: number): number[] => {
-    const digits = current.toString().length;
-    let base: number;
-    
-    if (digits <= 2) {
-      base = 1;
-    } else if (digits <= 4) {
-      base = 10;
-    } else {
-      base = Math.pow(10, digits - 2);
+    switch (unit) {
+      case 'années':
+        nextDate.setFullYear(birth.getFullYear() + target);
+        break;
+      case 'mois':
+        nextDate.setMonth(birth.getMonth() + target);
+        break;
+      case 'minutes':
+        nextDate.setMinutes(birth.getMinutes() + target);
+        break;
+      case 'secondes':
+        nextDate.setSeconds(birth.getSeconds() + target);
+        break;
     }
 
-    return Array.from({ length: 5 }, (_, i) => {
-      let milestone = Math.ceil(current / base) * base + (i * base);
-      while (milestone.toString().replace(/0+$/, '').length > 2) {
-        milestone = Math.ceil(milestone / (base * 10)) * (base * 10);
-      }
-      return milestone;
-    });
-  };
+    return nextDate;
+  }
 
-  const calculateNextDate = (current: number, target: number, unitMs: number): Date => {
-    const unitsToAdd = target - current;
-    return new Date(now.getTime() + unitsToAdd * unitMs);
-  };
 
-  // Calculate milestones for each unit
+  // Compute milestones
   const milestones: MilestoneData[] = [
     {
       current: diffYears,
-      next: selectedMilestones.years || diffYears + 1,
-      nextDate: calculateNextDate(diffYears, selectedMilestones.years || diffYears + 1, 365.25 * 24 * 60 * 60 * 1000),
+      next: selectedMilestones.years || generateMilestoneOptions(diffYears, 'années')[0],
+      nextDate: calculateNextDate(diffYears, selectedMilestones.years || generateMilestoneOptions(diffYears, 'années')[0], 'années', birth),
       unit: 'années',
-      options: generateYearOptions(diffYears),
-      selectedMilestone: selectedMilestones.years || diffYears + 1
+      options: generateMilestoneOptions(diffYears, 'années'),
+      selectedMilestone: selectedMilestones.years || generateMilestoneOptions(diffYears, 'années')[0]
     },
     {
       current: diffMonths,
-      next: selectedMilestones.months || (diffMonths < 12 ? diffMonths + 1 : Math.ceil(diffMonths / 10) * 10),
-      nextDate: calculateNextDate(diffMonths, selectedMilestones.months || (diffMonths < 12 ? diffMonths + 1 : Math.ceil(diffMonths / 10) * 10), 30.44 * 24 * 60 * 60 * 1000),
+      next: selectedMilestones.months || generateMilestoneOptions(diffMonths, 'mois')[0],
+      nextDate: calculateNextDate(diffMonths, selectedMilestones.months || generateMilestoneOptions(diffMonths, 'mois')[0], 'mois', birth),
       unit: 'mois',
-      options: generateMonthOptions(diffMonths),
-      selectedMilestone: selectedMilestones.months || (diffMonths < 12 ? diffMonths + 1 : Math.ceil(diffMonths / 10) * 10)
+      options: generateMilestoneOptions(diffMonths, 'mois'),
+      selectedMilestone: selectedMilestones.months || generateMilestoneOptions(diffMonths, 'mois')[0]
     },
     {
       current: diffMinutes,
-      next: selectedMilestones.minutes || generateTimeOptions(diffMinutes)[0],
-      nextDate: calculateNextDate(diffMinutes, selectedMilestones.minutes || generateTimeOptions(diffMinutes)[0], 60 * 1000),
+      next: selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0],
+      nextDate: calculateNextDate(diffMinutes, selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0], 'minutes', birth),
       unit: 'minutes',
-      options: generateTimeOptions(diffMinutes),
-      selectedMilestone: selectedMilestones.minutes || generateTimeOptions(diffMinutes)[0]
+      options: generateMilestoneOptions(diffMinutes, 'minutes'),
+      selectedMilestone: selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0]
     },
     {
       current: diffSeconds,
-      next: selectedMilestones.seconds || generateTimeOptions(diffSeconds)[0],
-      nextDate: calculateNextDate(diffSeconds, selectedMilestones.seconds || generateTimeOptions(diffSeconds)[0], 1000),
+      next: selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'secondes')[0],
+      nextDate: calculateNextDate(diffSeconds, selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'secondes')[0], 'secondes', birth),
       unit: 'secondes',
-      options: generateTimeOptions(diffSeconds),
-      selectedMilestone: selectedMilestones.seconds || generateTimeOptions(diffSeconds)[0]
+      options: generateMilestoneOptions(diffSeconds, 'secondes'),
+      selectedMilestone: selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'secondes')[0]
     }
   ];
 
@@ -136,13 +151,11 @@ function App() {
   useEffect(() => {
     if (!birthDate) return;
 
-    // Initial calculation
     setMilestones(calculateMilestones(new Date(birthDate), selectedMilestones));
 
-    // Update less frequently to avoid state conflicts
     const timer = setInterval(() => {
       setMilestones(calculateMilestones(new Date(birthDate), selectedMilestones));
-    }, 5000); // Update every 5 seconds instead of every second
+    }, 5000);
 
     return () => clearInterval(timer);
   }, [birthDate, selectedMilestones]);
@@ -178,7 +191,7 @@ function App() {
         {milestones.length > 0 && (
           <div className="space-y-6">
             {milestones.map((milestone) => (
-              <div 
+              <div
                 key={milestone.unit}
                 className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6"
               >
@@ -188,7 +201,7 @@ function App() {
                     {milestone.unit}
                   </h2>
                 </div>
-                
+
                 <div className="space-y-4">
                   <p className="text-gray-600">
                     Actuel : <span className="font-bold text-indigo-600">{milestone.current.toLocaleString('fr-FR')}</span> {milestone.unit}
