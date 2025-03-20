@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { Calendar, Clock, Milestone } from 'lucide-react';
 
 interface MilestoneData {
@@ -82,7 +80,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
           daysFirstMilestone + daysBase * 4,
           daysFirstMilestone + daysBase * 5
         ];
-        const nextRoundNumberDays = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
+        const nextRoundNumberDays = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestonesDays.includes(nextRoundNumberDays)) milestonesDays.push(nextRoundNumberDays);
         return milestonesDays;
 
@@ -107,8 +105,6 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
         return [];
     }
   }
-
-
 
   function calculateNextDate(current: number, target: number, unit: string, birth: Date): Date {
     const nextDate = new Date(birth);
@@ -194,17 +190,17 @@ function formatDate(date: Date): string {
 }
 
 function App() {
-  const [birthDate, setBirthDate] = useState<Date | null>(null);
+  const [birthDate, setBirthDate] = useState<string>('');
   const [milestones, setMilestones] = useState<MilestoneData[]>([]);
   const [selectedMilestones, setSelectedMilestones] = useState<Record<string, number>>({});
 
   useEffect(() => {
     if (!birthDate) return;
 
-    setMilestones(calculateMilestones(birthDate, selectedMilestones));
+    setMilestones(calculateMilestones(new Date(birthDate), selectedMilestones));
 
     const timer = setInterval(() => {
-      setMilestones(calculateMilestones(birthDate, selectedMilestones));
+      setMilestones(calculateMilestones(new Date(birthDate), selectedMilestones));
     }, 5000);
 
     return () => clearInterval(timer);
@@ -217,29 +213,33 @@ function App() {
     }));
   };
 
+  // Sort milestones by next date (chronological order)
+  const sortedMilestones = [...milestones].sort((a, b) => a.nextDate.getTime() - b.nextDate.getTime());
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center p-4">
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
         <div className="flex items-center gap-2 mb-6">
           <Milestone className="w-6 h-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-800">Calculateur d'anniversaire</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Vos anniversaires à venir</h1>
         </div>
 
         <div className="mb-8">
           <label htmlFor="birthdate" className="block text-sm font-medium text-gray-700 mb-2">
             Quelle est votre date de naissance ?
           </label>
-          <DatePicker
-            selected={birthDate}
-            onChange={(date: Date | null) => setBirthDate(date)}
-            dateFormat="dd/MM/yyyy"
+          <input
+            type="date"
+            id="birthdate"
+            value={birthDate}
+            onChange={(e) => setBirthDate(e.target.value)}
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
           />
         </div>
 
-        {milestones.length > 0 && (
+        {sortedMilestones.length > 0 && (
           <div className="space-y-6">
-            {milestones.map((milestone) => (
+            {sortedMilestones.map((milestone) => (
               <div
                 key={milestone.unit}
                 className="bg-gradient-to-r from-indigo-50 to-purple-50 rounded-lg p-6"
