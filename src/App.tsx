@@ -49,7 +49,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
         }
         const yearsDigits = current.toString().length;
         const yearsBase = Math.pow(10, yearsDigits - 1);
-        const yearsFirstMilestone = Math.ceil((current) / yearsBase) * yearsBase;
+        const yearsFirstMilestone = Math.ceil((current + 1) / yearsBase) * yearsBase;
         const milestones = [
           yearsFirstMilestone,
           yearsFirstMilestone + yearsBase,
@@ -60,6 +60,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
         ];
         const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
         if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
+        //If today is the actual birthday, set it as first element of the list
         if (now.getDate() === birth.getDate()) milestones.unshift(current);
         return milestones;
 
