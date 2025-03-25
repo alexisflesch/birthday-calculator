@@ -1,3 +1,5 @@
 # birthday-calculator
 
-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/alexisflesch/birthday-calculator)
+App built mainly with bolt.new. Modifications were made to the generated code afterward with copilot.
+
+Given your birth date, compute coming milestones (years, months, weeks, days, hours, minutes, seconds).
