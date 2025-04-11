@@ -307,7 +307,7 @@ function App() {
       <div className="bg-white rounded-xl shadow-lg p-8 max-w-2xl w-full">
         <div className="flex items-center gap-2 mb-6">
           <Cake className="w-6 h-6 text-indigo-600" />
-          <h1 className="text-2xl font-bold text-gray-800">Vos anniversaires à venir</h1>
+          <h1 className="text-2xl font-bold text-gray-800">Time2Birthday</h1>
         </div>
 
         <div className="mb-8">
