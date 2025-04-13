@@ -25,6 +25,10 @@ jobs:
         run: npm ci
       - name: Build
         run: npm run build
+      - name: Copy service worker files to correct location
+        run: |
+          cp -f public/service-worker.js dist/
+          cp -f public/manifest.json dist/ 
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload artifact

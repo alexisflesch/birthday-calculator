@@ -1,11 +1,11 @@
 const CACHE_NAME = 'birthday-calculator-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/src/main.tsx',
-  '/src/App.tsx',
-  '/src/index.css',
-  '/cake.svg'
+  './',
+  './index.html',
+  './assets/index-BDSFwgrJ.js',
+  './assets/index-DcNY-xdj.css',
+  './cake.svg',
+  './manifest.json'
 ];
 
 // Install a service worker
