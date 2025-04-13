@@ -37,6 +37,10 @@ jobs:
       - name: Build the project
         run: npm run build
 
+      # Create .nojekyll file to prevent Jekyll processing
+      - name: Add .nojekyll file
+        run: touch ./dist/.nojekyll
+
       - name: Setup Pages
         uses: actions/configure-pages@v5
 
