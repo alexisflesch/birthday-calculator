@@ -37,48 +37,55 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
   }
 
   function generateMilestoneOptions(current: number, unit: string): number[] {
+    // Helper function to check if milestone date is in the future
+    function isValidFutureMilestone(milestone: number): boolean {
+      const milestoneDate = calculateNextDate(milestone, unit, birth);
+      return milestoneDate > now;
+    }
+
+    let milestones: number[] = [];
+
     switch (unit) {
       case 'years':
         if (current < 20) {
-          const milestones = Array.from({ length: 5 }, (_, i) => current + i + 1);
+          milestones = Array.from({ length: 5 }, (_, i) => current + i + 1);
           const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
           if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
           // If today is the actual birthday, set it as first element of the list
           if (now.getDate() === birth.getDate()) milestones.unshift(current);
-          return milestones;
+        } else {
+          const yearsDigits = current.toString().length;
+          const yearsBase = Math.pow(10, yearsDigits - 1);
+          const yearsFirstMilestone = Math.ceil((current + 1) / yearsBase) * yearsBase;
+          milestones = [
+            yearsFirstMilestone,
+            yearsFirstMilestone + yearsBase,
+            yearsFirstMilestone + yearsBase * 2,
+            yearsFirstMilestone + yearsBase * 3,
+            yearsFirstMilestone + yearsBase * 4,
+            yearsFirstMilestone + yearsBase * 5
+          ];
+          const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
+          if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
+          //If today is the actual birthday, set it as first element of the list
+          if (now.getDate() === birth.getDate()) milestones.unshift(current);
         }
-        const yearsDigits = current.toString().length;
-        const yearsBase = Math.pow(10, yearsDigits - 1);
-        const yearsFirstMilestone = Math.ceil((current + 1) / yearsBase) * yearsBase;
-        const milestones = [
-          yearsFirstMilestone,
-          yearsFirstMilestone + yearsBase,
-          yearsFirstMilestone + yearsBase * 2,
-          yearsFirstMilestone + yearsBase * 3,
-          yearsFirstMilestone + yearsBase * 4,
-          yearsFirstMilestone + yearsBase * 5
-        ];
-        const nextRoundNumber = Math.ceil((current + 1) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
-        if (!milestones.includes(nextRoundNumber)) milestones.push(nextRoundNumber);
-        //If today is the actual birthday, set it as first element of the list
-        if (now.getDate() === birth.getDate()) milestones.unshift(current);
-        return milestones;
+        break;
 
       case 'months':
-        let milestonesMonths;
-        if (current < 10) milestonesMonths = [10, 20, 30, 40, 50].filter(m => m >= current);
-        else if (current < 100) milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil((current) / 10) * 10 + i * 10);
-        else milestonesMonths = Array.from({ length: 5 }, (_, i) => Math.ceil(current / 100) * 100 + i * 100);
+        if (current < 10) milestones = [10, 20, 30, 40, 50].filter(m => m >= current);
+        else if (current < 100) milestones = Array.from({ length: 5 }, (_, i) => Math.ceil((current) / 10) * 10 + i * 10);
+        else milestones = Array.from({ length: 5 }, (_, i) => Math.ceil(current / 100) * 100 + i * 100);
 
         const nextRoundNumberMonths = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
-        if (!milestonesMonths.includes(nextRoundNumberMonths)) milestonesMonths.push(nextRoundNumberMonths);
-        return milestonesMonths;
+        if (!milestones.includes(nextRoundNumberMonths)) milestones.push(nextRoundNumberMonths);
+        break;
 
       case 'weeks':
         const weeksDigits = current.toString().length;
         const weeksBase = Math.min(Math.pow(10, weeksDigits - 1), 100);
         const weeksFirstMilestone = Math.ceil((current) / weeksBase) * weeksBase;
-        const milestonesWeeks = [
+        milestones = [
           weeksFirstMilestone,
           weeksFirstMilestone + weeksBase,
           weeksFirstMilestone + weeksBase * 2,
@@ -87,14 +94,14 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
           weeksFirstMilestone + weeksBase * 5
         ];
         const nextRoundNumberWeeks = Math.ceil((current) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
-        if (!milestonesWeeks.includes(nextRoundNumberWeeks)) milestonesWeeks.push(nextRoundNumberWeeks);
-        return milestonesWeeks;
+        if (!milestones.includes(nextRoundNumberWeeks)) milestones.push(nextRoundNumberWeeks);
+        break;
 
       case 'days':
         const daysDigits = current.toString().length;
         const daysBase = Math.min(Math.pow(10, daysDigits - 1), 1000);
         const daysFirstMilestone = Math.ceil((current) / daysBase) * daysBase;
-        const milestonesDays = [
+        milestones = [
           daysFirstMilestone,
           daysFirstMilestone + daysBase,
           daysFirstMilestone + daysBase * 2,
@@ -103,15 +110,15 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
           daysFirstMilestone + daysBase * 5
         ];
         const nextRoundNumberDays = Math.ceil((current) / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
-        if (!milestonesDays.includes(nextRoundNumberDays)) milestonesDays.push(nextRoundNumberDays);
-        return milestonesDays;
+        if (!milestones.includes(nextRoundNumberDays)) milestones.push(nextRoundNumberDays);
+        break;
 
       case 'minutes':
       case 'seconds':
         const digits = current.toString().length;
         const base = Math.pow(10, digits - 2);  // Two significant digits
         const firstMilestone = Math.ceil((current) / base) * base;
-        const milestonesTime = [
+        milestones = [
           firstMilestone,
           firstMilestone + base,
           firstMilestone + base * 2,
@@ -120,15 +127,27 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
           firstMilestone + base * 5
         ];
         const nextRoundNumberTime = Math.ceil(current / Math.pow(10, current.toString().length - 1)) * Math.pow(10, current.toString().length - 1);
-        if (!milestonesTime.includes(nextRoundNumberTime)) milestonesTime.push(nextRoundNumberTime);
-        return milestonesTime;
-
-      default:
-        return [];
+        if (!milestones.includes(nextRoundNumberTime)) milestones.push(nextRoundNumberTime);
+        break;
     }
+
+    // Filter out milestone dates that are in the past
+    milestones = milestones.filter(isValidFutureMilestone);
+
+    // If all milestone options were filtered out (all in the past), 
+    // add the next valid milestone starting from current+1
+    if (milestones.length === 0) {
+      let nextValidMilestone = current + 1;
+      while (!isValidFutureMilestone(nextValidMilestone) && nextValidMilestone < current + 20) {
+        nextValidMilestone++;
+      }
+      milestones.push(nextValidMilestone);
+    }
+
+    return milestones;
   }
 
-  function calculateNextDate(current: number, target: number, unit: string, birth: Date): Date {
+  function calculateNextDate(target: number, unit: string, birth: Date): Date {
     const nextDate = new Date(birth);
     switch (unit) {
       case 'years':
@@ -158,7 +177,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffYears,
       next: selectedMilestones.years || generateMilestoneOptions(diffYears, 'years')[0],
-      nextDate: calculateNextDate(diffYears, selectedMilestones.years || generateMilestoneOptions(diffYears, 'years')[0], 'years', birth),
+      nextDate: calculateNextDate(selectedMilestones.years || generateMilestoneOptions(diffYears, 'years')[0], 'years', birth),
       unit: 'years',
       frenchUnit: 'ans',
       options: generateMilestoneOptions(diffYears, 'years'),
@@ -167,7 +186,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffMonths,
       next: selectedMilestones.months || generateMilestoneOptions(diffMonths, 'months')[0],
-      nextDate: calculateNextDate(diffMonths, selectedMilestones.months || generateMilestoneOptions(diffMonths, 'months')[0], 'months', birth),
+      nextDate: calculateNextDate(selectedMilestones.months || generateMilestoneOptions(diffMonths, 'months')[0], 'months', birth),
       unit: 'months',
       frenchUnit: 'mois',
       options: generateMilestoneOptions(diffMonths, 'months'),
@@ -176,7 +195,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffWeeks,
       next: selectedMilestones.weeks || generateMilestoneOptions(diffWeeks, 'weeks')[0],
-      nextDate: calculateNextDate(diffWeeks, selectedMilestones.weeks || generateMilestoneOptions(diffWeeks, 'weeks')[0], 'weeks', birth),
+      nextDate: calculateNextDate(selectedMilestones.weeks || generateMilestoneOptions(diffWeeks, 'weeks')[0], 'weeks', birth),
       unit: 'weeks',
       frenchUnit: 'semaines',
       options: generateMilestoneOptions(diffWeeks, 'weeks'),
@@ -185,7 +204,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffDays,
       next: selectedMilestones.days || generateMilestoneOptions(diffDays, 'days')[0],
-      nextDate: calculateNextDate(diffDays, selectedMilestones.days || generateMilestoneOptions(diffDays, 'days')[0], 'days', birth),
+      nextDate: calculateNextDate(selectedMilestones.days || generateMilestoneOptions(diffDays, 'days')[0], 'days', birth),
       unit: 'days',
       frenchUnit: 'jours',
       options: generateMilestoneOptions(diffDays, 'days'),
@@ -194,7 +213,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffMinutes,
       next: selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0],
-      nextDate: calculateNextDate(diffMinutes, selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0], 'minutes', birth),
+      nextDate: calculateNextDate(selectedMilestones.minutes || generateMilestoneOptions(diffMinutes, 'minutes')[0], 'minutes', birth),
       unit: 'minutes',
       frenchUnit: 'minutes',
       options: generateMilestoneOptions(diffMinutes, 'minutes'),
@@ -203,7 +222,7 @@ function calculateMilestones(birthDate: Date, selectedMilestones: Record<string,
     {
       current: diffSeconds,
       next: selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'seconds')[0],
-      nextDate: calculateNextDate(diffSeconds, selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'seconds')[0], 'seconds', birth),
+      nextDate: calculateNextDate(selectedMilestones.seconds || generateMilestoneOptions(diffSeconds, 'seconds')[0], 'seconds', birth),
       unit: 'seconds',
       frenchUnit: 'secondes',
       options: generateMilestoneOptions(diffSeconds, 'seconds'),
