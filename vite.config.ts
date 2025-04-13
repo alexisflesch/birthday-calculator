@@ -4,6 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  base: '/birthday-calculator/',  // Add this line - replace with your repo name
   plugins: [
     react(),
     VitePWA({
@@ -23,6 +24,9 @@ export default defineConfig({
         display: 'standalone',
         theme_color: '#6366f1',
         background_color: '#ffffff'
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg}']
       }
     })
   ],

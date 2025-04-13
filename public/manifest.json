@@ -3,12 +3,12 @@
     "name": "Time2Birthday",
     "icons": [
         {
-            "src": "cake.svg",
+            "src": "./cake.svg",
             "sizes": "192x192",
             "type": "image/svg+xml"
         }
     ],
-    "start_url": "./",
+    "start_url": "../",
     "display": "standalone",
     "theme_color": "#6366f1",
     "background_color": "#ffffff"
