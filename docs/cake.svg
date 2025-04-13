@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   width="24"
+   height="24"
+   viewBox="0 0 24 24"
+   fill="none"
+   stroke="currentColor"
+   stroke-width="2"
+   stroke-linecap="round"
+   stroke-linejoin="round"
+   class="lucide lucide-cake"
+   version="1.1"
+   id="svg9"
+   sodipodi:docname="cake.svg"
+   inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs9" />
+  <sodipodi:namedview
+     id="namedview9"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="22.892582"
+     inkscape:cx="15.026702"
+     inkscape:cy="14.043851"
+     inkscape:window-width="1920"
+     inkscape:window-height="991"
+     inkscape:window-x="-9"
+     inkscape:window-y="-9"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg9" />
+  <rect
+     style="opacity:1;fill:#ffffff;stroke:none;stroke-width:0.377953;paint-order:markers fill stroke"
+     id="rect9"
+     x="0"
+     y="0"
+     height="24"
+     width="24" />
+  <path
+     d="M20 21v-8a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8"
+     id="path1"
+     style="stroke:#000080" />
+  <path
+     d="M4 16s.5-1 2-1 2.5 2 4 2 2.5-2 4-2 2.5 2 4 2 2-1 2-1"
+     id="path2"
+     style="stroke:#000080" />
+  <path
+     d="M2 21h20"
+     id="path3"
+     style="stroke:#000080" />
+  <path
+     d="M7 8v3"
+     id="path4"
+     style="stroke:#000080" />
+  <path
+     d="M12 8v3"
+     id="path5"
+     style="stroke:#000080" />
+  <path
+     d="M17 8v3"
+     id="path6"
+     style="stroke:#000080" />
+  <path
+     d="M7 4h.01"
+     id="path7"
+     style="stroke:#000080" />
+  <path
+     d="M12 4h.01"
+     id="path8"
+     style="stroke:#000080" />
+  <path
+     d="M17 4h.01"
+     id="path9"
+     style="stroke:#000080" />
+</svg>

@@ -5,6 +5,10 @@ import { VitePWA } from 'vite-plugin-pwa';
 // https://vitejs.dev/config/
 export default defineConfig({
   base: '/birthday-calculator/',  // Add this line - replace with your repo name
+  build: {
+    outDir: 'docs', // Build to docs/ instead of dist/
+    emptyOutDir: true, // Clear the output directory before building
+  },
   plugins: [
     react(),
     VitePWA({
